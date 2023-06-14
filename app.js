@@ -1,3 +1,2 @@
-const Step = require('./step')
-const Act = require('./act')
-
+const Step = require('./step');
+const Act = require('./act');
