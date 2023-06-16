@@ -13,7 +13,7 @@ const app = () => {
 
   steps.loopToGetAllDone();
   console.log(steps.memory.length);
-  console.log(steps);
+  // console.log(steps);
 
   // console.log(getAvailableActs(['a', 'b', 'c', 'd', 'e', 'f', 'h']));
 

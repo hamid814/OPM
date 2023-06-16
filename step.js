@@ -1,5 +1,12 @@
 require('colors');
+const fs = require('fs');
 const { getAvailableActs } = require('./act');
+
+function wrtiteToFile(txt) {
+  fs.appendFile('configs.txt', txt + '\n', function (err) {
+    if (err) throw err;
+  });
+}
 
 class Step {
   constructor(acts) {
@@ -36,7 +43,7 @@ class Steps {
     this.isChainComplete = false;
     this.memory = [];
     this.devParams = {
-      maxIters: Infinity,
+      maxIters: 558,
       currIter: 0,
     };
   }
@@ -52,7 +59,7 @@ class Steps {
 
   saveChain() {
     this.memory.push(this.getStringOfDone());
-    // console.log(this.getStringOfDone());
+    // wrtiteToFile(this.getStringOfDone());
   }
 
   getCurrentStep() {
@@ -68,7 +75,7 @@ class Steps {
           .bgGreen
       );
 
-    this.checkIsChainComplete();
+    this.checkIsChainComplete('ch');
 
     while (!this.isChainComplete) {
       const avs = getAvailableActs(this.getDoneActs());
@@ -76,7 +83,7 @@ class Steps {
 
       this.addStep(avs);
 
-      this.checkIsChainComplete();
+      this.checkIsChainComplete('ch');
     }
 
     log &&
@@ -127,14 +134,16 @@ class Steps {
       );
   }
 
-  checkIsChainComplete() {
+  checkIsChainComplete(calledFrom) {
+    const log = false;
+
     const avs = getAvailableActs(this.getDoneActs());
+
+    log && console.log(calledFrom, '->', avs);
 
     const isComplete = avs.length == 0;
 
     this.isChainComplete = isComplete;
-
-    console.log(isComplete);
 
     return isComplete;
   }
@@ -156,6 +165,8 @@ class Steps {
       if (!step.isDone) allDone = false;
     });
 
+    if (this.steps.length <= 1) allDone = false;
+
     this.isAllDone = allDone;
 
     return allDone;
@@ -163,15 +174,15 @@ class Steps {
 
   loopToGetAllDone() {
     while (
-      !this.isAllDone &&
-      !this.isChainComplete
-      //   &&      this.devParams.currIter <= this.devParams.maxIters
+      //   !this.isAllDone
+      //   !this.isChainComplete
+      this.devParams.currIter <= this.devParams.maxIters
     ) {
       if (this.isChainComplete) this.destructChain();
       this.completeChain();
       this.saveChain();
       this.destructChain();
-      this.checkIsChainComplete();
+      this.checkIsChainComplete('loop');
 
       this.checkAllDone();
 
